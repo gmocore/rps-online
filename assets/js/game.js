@@ -31,9 +31,16 @@ function runGame() {
   }
 }
 
+$("button").click(function() {
+  database.ref("/playerChoice").set({
+    playerChoice: p1Selection
+  });
+});
+
 $("#p1-rock").click(function(e) {
   p1Selection = $(this).text();
   console.log(p1Selection);
+
   p1 = true;
   runGame();
 });
@@ -69,3 +76,55 @@ $("#p2-scissors").click(function(e) {
 });
 
 //     - tracks wins, losses, and ties for each player, update dom with those values
+
+const firebaseConfig = {
+  apiKey: "AIzaSyATH9rMlnexJ0eqfWI7Zttw0fyqj_fF6LQ",
+  authDomain: "rps-online-46755.firebaseapp.com",
+  databaseURL: "https://rps-online-46755.firebaseio.com",
+  projectId: "rps-online-46755",
+  storageBucket: "rps-online-46755.appspot.com",
+  messagingSenderId: "509724336233",
+  appId: "1:509724336233:web:c657f2feba716d54"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const database = firebase.database();
+
+var connectionsRef = database.ref("/connections");
+var connectedRef = database.ref(".info/connected");
+
+// When the client's connection state changes...
+connectedRef.on("value", function(snap) {
+  // If they are connected..
+  if (snap.val()) {
+    // Add user to the connections list.
+    var con = connectionsRef.push(true);
+
+    // Remove user from the connection list when they disconnect.
+    con.onDisconnect().remove();
+  }
+});
+
+// This callback allows the page to stay updated with the values in firebase node "clicks"
+database.ref("/playerChoice").on(
+  "value",
+  function(snapshot) {
+    // Print the local data to the console.
+    console.log(snapshot.val());
+    p1Selection = "";
+    // Change the HTML to reflect the local value in firebase.
+    playerChoice = snapshot.val().p1Selection;
+
+    // Log the value of the clickCounter
+    console.log(playerChoice);
+
+    // Change the HTML to reflect the local value in firebase.
+    // $("#click-value").text(clickCounter);
+
+    // If any errors are experienced, log them to console.
+  },
+  function(errorObject) {
+    console.log("The read failed: " + errorObject.code);
+  }
+);
