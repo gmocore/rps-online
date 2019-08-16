@@ -4,7 +4,8 @@ let p1Victory = 0,
   p2Victory = 0,
   p1Loss = 0,
   p2Loss = 0,
-  tieGame = 0;
+  tieGame = 0,
+  userTurn = 0;
 
 // - game logic
 function rps(p1Choice, p2Choice) {
@@ -106,6 +107,17 @@ connectedRef.on("value", function(snap) {
   }
 });
 
+connectionsRef.on("value", function(snap) {
+  // Display the viewer count in the html.
+  // The number of online users is the number of children in the connections list.
+  // $("#connected-viewers").text(snap.numChildren());
+  let usersConnected = snap.numChildren();
+  console.log(usersConnected);
+  if (usersConnected > 2) {
+    // connectionsRef.remove();
+  }
+});
+
 // This callback allows the page to stay updated with the values in firebase node "clicks"
 database.ref("/playerChoice").on(
   "value",
@@ -115,12 +127,6 @@ database.ref("/playerChoice").on(
     p1Selection = "";
     // Change the HTML to reflect the local value in firebase.
     playerChoice = snapshot.val().p1Selection;
-
-    // Log the value of the clickCounter
-    console.log(playerChoice);
-
-    // Change the HTML to reflect the local value in firebase.
-    // $("#click-value").text(clickCounter);
 
     // If any errors are experienced, log them to console.
   },
